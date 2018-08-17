@@ -669,12 +669,14 @@ categoryName = ["電動缸、音圈馬達", "點膠類", "光電類", "馬達HAN
 ARGV.each_with_index do |fileName, file_index|
   result[fileName] = default_data
 
+  totalRevenu = 0
+
   CSV.foreach("source/#{fileName}", headers: true, encoding: "UTF-8").with_index do |row, fileRow_index|
 
       sellDate = row[3].strip
       quantity = row[7].strip
       singlePrice = row[9].strip
-      singlePriceTotal = row[10].to_s.gsub(',', '').to_i
+      singlePriceTotal = row[10].gsub(',', '').to_i
       clientName = row[13].strip
       categoryCode = row[18].strip
 
@@ -701,10 +703,14 @@ ARGV.each_with_index do |fileName, file_index|
             originTotal = result[fileName][clientName][_month][categoryCode].to_i
             afterTotal = originTotal + (singlePriceTotal || 0).to_i
             result[fileName][clientName][_month][categoryCode] = afterTotal
+
+            totalRevenu += (singlePriceTotal || 0).to_i
           else
             originTotal = result[fileName]["光鈦-桃園"][_month][categoryCode].to_i
             afterTotal = originTotal + (singlePriceTotal || 0).to_i
             result[fileName]["光鈦-桃園"][_month][categoryCode] = afterTotal
+
+            totalRevenu += (singlePriceTotal || 0).to_i
           end
         end
       rescue Exception => e
@@ -712,7 +718,9 @@ ARGV.each_with_index do |fileName, file_index|
       end
   end
 
-  puts result
+  puts "totalRevenu: #{totalRevenu}"
+  puts "totalRevenu: #{totalRevenu}"
+  puts "totalRevenu: #{totalRevenu}"
 
   allMonths.each_with_index do |month, month_index|
     sheet[0, (file_index*allMonths.count + (month_index + 3))] = "#{fileName.gsub(".csv", "")}年"
